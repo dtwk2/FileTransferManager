@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Utilities" Version="16.4.29519.181" />
+    <PackageReference Include="ReactiveUI.WPF" Version="11.1.23" />
+    <PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.258" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IOExtensions.Reactive\IOExtensions.Reactive.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="FileProgressView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="FileProgressView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+</Project>

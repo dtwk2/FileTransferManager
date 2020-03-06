@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Data\7z.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IOExtensions.Reactive\IOExtensions.Reactive.csproj" />
+    <ProjectReference Include="..\IONotifications.View\IOExtensions.View.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HandyControl" Version="2.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Data\7z.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if $(ConfigurationName) == Debug   copy $(ProjectDir)\Data\7z.dll $(TargetDir)\7z.dll"></Exec>
+  </Target>
+
+</Project>

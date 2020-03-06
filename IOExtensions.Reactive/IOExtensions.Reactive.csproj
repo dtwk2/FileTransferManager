@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.2</Version>
+    <Description>Reactive Wrapper for IOExtensions</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Squid-Box.SevenZipSharp" Version="1.2.258" />
+    <PackageReference Include="System.Reactive" Version="4.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IOExtensions.Abstract\IOExtensions.Abstract.csproj" />
+  </ItemGroup>
+
+</Project>
