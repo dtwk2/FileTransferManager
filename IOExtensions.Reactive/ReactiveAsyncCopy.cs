@@ -9,13 +9,14 @@ using IOExtensions.Core;
 namespace IOExtensions.Reactive
 {
 
-    public class ReactiveAsyncCopy : Transferer
+    public class ReactiveAsyncCopy : ITransferer
     {
         private Subject<TransferProgress> transferProgress = new Subject<TransferProgress>();
 
-        public override IObservable<TransferProgress> Transfer(string source, string destination)
+        public IObservable<TransferProgress> Transfer(params string[] args)
         {
-
+            string source = args[0];
+            string destination = args[1];
             async void Init()
             {
                 await FileTransferManager.CopyWithProgressAsync(

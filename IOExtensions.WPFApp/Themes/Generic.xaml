@@ -1,61 +1,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:IOExtensions.View"
-                    xmlns:wpfApp="clr-namespace:IOExtensions.WPFApp"
-                    xmlns:hc="https://handyorg.github.io/handycontrol">
+                   >
 
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/styles/progressbar.xaml"/>
-    </ResourceDictionary.MergedDictionaries>
-    <Style TargetType="{x:Type local:MultiStageProgress }">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:MultiStageProgress }">
-          
-                        <Grid MaxWidth="1000" MaxHeight="600">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
-                                <ColumnDefinition Width="4*"></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <hc:StepBar x:Name="StepBar1" Dock="Left" VerticalAlignment="Stretch" HorizontalAlignment="Right" MinWidth="200">
-                                <hc:StepBar.ItemTemplate>
-                                    <DataTemplate DataType="{x:Type local:StepBarModel}">
-                                        <Grid >
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition></RowDefinition>
-                                                <RowDefinition></RowDefinition>
-                                            </Grid.RowDefinitions>
-                                            <TextBlock Text="{Binding Header}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
-                                            <TextBlock Grid.Row="1" Margin="0,4,0,0" Text="{Binding Content}"/>
-                                        </Grid>
-                                    </DataTemplate>
-                                </hc:StepBar.ItemTemplate>
-                                <!--<hc:StepBar.ItemsPanel >
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Vertical"></StackPanel>
-                                    </ItemsPanelTemplate>
-                                </hc:StepBar.ItemsPanel>-->
-                            </hc:StepBar>
 
-                            <hc:TransitioningContentControl Grid.Column="1" x:Name="ContentControl1"  
-                                                        VerticalContentAlignment="Center"
-                                                        HorizontalContentAlignment="Left">
-                            </hc:TransitioningContentControl>
-
-                            <hc:CircleProgressBar Grid.Column="0"
-                                                Grid.ColumnSpan="2" x:Name="CircleProgressBar1" 
-                                              Margin="16,0,0,0" 
-                                              ShowText="False" 
-                                              Width="70" 
-                                              Height="70"
-                                              ArcThickness="36"
-                                              Style="{StaticResource ProgressBarInfoCircle}"/>
-                        </Grid>
-
-       
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
 
 </ResourceDictionary>

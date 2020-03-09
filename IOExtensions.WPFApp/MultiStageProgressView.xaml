@@ -5,47 +5,49 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:IOExtensions.WPFApp"
              xmlns:view="clr-namespace:IOExtensions.View;assembly=IOExtensions.View"
-             xmlns:view1="clr-namespace:IOExtensions.View"
-             xmlns:abstract="clr-namespace:IOExtensions.Abstract;assembly=IOExtensions.Abstract"
              xmlns:reactive="clr-namespace:IOExtensions.Reactive;assembly=IOExtensions.Reactive"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
+
         <reactive:ReactiveAsynExtract x:Key="Transferer1"></reactive:ReactiveAsynExtract>
         <reactive:ReactiveAsyncCopy x:Key="Transferer2"></reactive:ReactiveAsyncCopy>
 
-        <x:Array x:Key="Arr" Type="{x:Type view:FileProgressView}">
-            <view:FileProgressView   x:Name="FileProgressView1" 
+
+        <x:Array x:Key="Arr" Type="{x:Type view:FileProgressControl}">
+            <view:FileProgressControl   x:Name="FileProgressView1" 
                                      IsReadOnly="True" 
                                      ShowTransfer="False"
-                                     Source = "..\\..\\..\\Data\\HFRR2020.7z"
-                                     Destination = "..\\..\\..\\..\\Destination"
+                                     Source = "..\\..\\..\\Data\\Book.7z"
+                                     Destination = "Destination"
                                      Title="Unzipping"
                                      Transferer="{StaticResource Transferer1}"
-                                     ></view:FileProgressView>
+            ></view:FileProgressControl>
 
-            <view:FileProgressView   x:Name="FileProgressView2" 
-                                     IsReadOnly="True" 
-                                     ShowTransfer="False"
-                                     Source = "..\\..\\..\\..\\Destination\\HFRR2020"
-                                     Destination = "..\\..\\..\\..\\CopyDestination"
-                                     Title="Copying"
-                                     Transferer="{StaticResource Transferer2}"
-                                     ></view:FileProgressView>
+            <view:FileProgressControl   x:Name="FileProgressView2" 
+                                        IsReadOnly="True" 
+                                        ShowTransfer="False"
+                                        Source ="{Binding Path=DownloadsFolder, Source={x:Static Application.Current}}"
+                                        Destination = "..\\..\\..\\bin\\Debug\\"
+                                        Title="Copying"
+                                        Transferer="{StaticResource Transferer2}"
+            ></view:FileProgressControl>
         </x:Array>
 
     </UserControl.Resources>
     <Grid>
 
-        <view1:MultiStageProgress ProgressViews="{Binding Source={StaticResource Arr}}"/>
+        <view:MultiProgress ProgressViews="{Binding Source={StaticResource Arr}}"/>
 
+
+      
         <DockPanel Visibility="Collapsed" x:Name="FileProgress2Panel">
             <StackPanel DockPanel.Dock="Top" Visibility="Hidden" x:Name="GridButton"  >
-                <Button x:Name ="CloseButton"  Content="Close To Complete Update" Width="150" Height="30" Click="Close_OnClick" ></Button>
-                <Button x:Name ="CancelButton"  Content="Cancel Close" Width="150" Height="30" Click="CancelButton_OnClick" ></Button>
+                <Button x:Name ="CloseButton"  Content="Close To Complete Update" Width="150" Height="30"  ></Button>
+                <Button x:Name ="CancelButton"  Content="Cancel Close" Width="150" Height="30"  ></Button>
             </StackPanel>
         </DockPanel>
 
     </Grid>
-
 </UserControl>

@@ -16,16 +16,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using IOExtensions.Abstract;
+using IOExtensions.Core;
 using IOExtensions.Reactive;
-using Microsoft.VisualStudio.PlatformUI;
-using ReactiveUI;
+using Prism.Commands;
 
 namespace IOExtensions.View
 {
     /// <summary>
     /// Interaction logic for FileProgressView.xaml
     /// </summary>
-    public partial class FileProgressView : UserControl
+    public partial class FileProgressView : UserControl, IProgressView
     {
         private readonly Subject<Unit> transferButtonsClicks = new Subject<Unit>();
 
@@ -35,14 +35,16 @@ namespace IOExtensions.View
             ScheduleProgress();
             this.Loaded += FileProgressView_Loaded;
 
-            TransferCommand = new DelegateCommand(unit => transferButtonsClicks.OnNext(Unit.Default));
+            RunCommand = new DelegateCommand<object>(unit => transferButtonsClicks.OnNext(Unit.Default));
+
+            //CompleteEvents = this.ToCompleteChanges();
 
             showTransferChanges.SubscribeOnDispatcher().Subscribe(a =>
             {
                 transferButton.Visibility = a ? Visibility.Visible : Visibility.Hidden;
             });
 
-            transferButton.Command = TransferCommand;
+            transferButton.Command = RunCommand;
 
             readOnlyChanges.Subscribe(a =>
             {
@@ -64,61 +66,69 @@ namespace IOExtensions.View
             {
                 sourceChanges.OnNext(Source);
             }
+
             if (Destination != null)
             {
                 destinationChanges.OnNext(Destination);
             }
+
             showTransferChanges.OnNext(ShowTransfer);
             readOnlyChanges.OnNext(IsReadOnly);
         }
 
         private void ScheduleProgress()
         {
-            var scheduler = RxApp.MainThreadScheduler;
-            this.sourceChanges.Subscribe(a => { txtSource.Text = a; });
-            this.destinationChanges.Subscribe(a => { txtDestination.Text = a; });
-            lblPercent.Text = "0 %";
+            //var scheduler = RxApp.MainThreadScheduler;
+            //this.sourceChanges.Subscribe(a => { txtSource.Text = a; });
+            //this.destinationChanges.Subscribe(a => { txtDestination.Text = a; });
+            //lblPercent.Text = "0 %";
 
-            //CreateDummyFile();
-            TitleTextBlock.Text = Title;
+            ////CreateDummyFile();
+            //TitleTextBlock.Text = Title;
 
-            var obs = transferButtonsClicks
-                .WithLatestFrom(this.sourceChanges.DistinctUntilChanged()
-                        .CombineLatest(this.destinationChanges.DistinctUntilChanged(),
-                            this.transfererChanges,
-                            (a, b, c) => (a, b, c)),
-                    (a, b) => b);
+            //var obs = transferButtonsClicks
+            //    .WithLatestFrom(this.sourceChanges.DistinctUntilChanged()
+            //            .CombineLatest(this.destinationChanges.DistinctUntilChanged(),
+            //                this.transfererChanges,
+            //                (a, b, c) => (a, b, c)),
+            //        (a, b) => b);
 
-            obs.Subscribe(a =>
-            {
+            //obs.Subscribe(a =>
+            //{
 
-                TitleTextBlock.Visibility = Visibility.Visible;
-                transferButton.Visibility = Visibility.Collapsed;
-            });
+            //    TitleTextBlock.Visibility = Visibility.Visible;
+            //    transferButton.Visibility = Visibility.Collapsed;
+            //});
 
-            obs
-                 .SelectMany(a =>
-                 {
-                     var (source, destination, transferer) = a;
-                     Directory.CreateDirectory(destination);
-                     return transferer.Transfer(source, destination);
-                 }).Subscribe(a =>
-                 {
-                     scheduler.Schedule(() =>
-                     {
-                         IsComplete = false;
-                         progressBar.Value = a.Percentage;
+            //obs
+            //    .SelectMany(a =>
+            //    {
+            //        var (source, destination, transferer) = a;
+            //        Directory.CreateDirectory(destination);
+            //        return transferer.Transfer(source, destination)
+            //            .Scan((date: DateTime.Now, default(TimeSpan), default(TransferProgress)),
+            //                (d, t) => (d.date, DateTime.Now - d.date, t));
+            //    }).Subscribe(a =>
+            //    {
+            //        (DateTime start, TimeSpan timeSpan, TransferProgress transferProgress) = a;
+            //        scheduler.Schedule(() =>
+            //        {
+            //            IsComplete = false;
+            //            progressBar.Value = transferProgress.Percentage;
 
-                         lblPercent.Text = a.AsPercentage();
-                         if (a.BytesTransferred == a.Total || a.Transferred == a.Total)
-                         {
-                             IsComplete = true;
-                             RaiseCompleteEvent();
-                             TitleTextBlock.Opacity = 0.5;
-                             // transferButton.Visibility = Visibility.Visible;
-                         }
-                     });
-                 });
+            //            lblPercent.Text = transferProgress.AsPercentage();
+            //            if (transferProgress.BytesTransferred == transferProgress.Total ||
+            //                transferProgress.Transferred == transferProgress.Total)
+            //            {
+            //                IsComplete = true;
+            //                RaiseCompleteEvent(timeSpan);
+            //                TitleTextBlock.Opacity = 0.5;
+            //                // transferButton.Visibility = Visibility.Visible;
+            //            }
+            //        });
+            //    });
+
+
         }
 
 
@@ -131,7 +141,8 @@ namespace IOExtensions.View
 
         // Using a DependencyProperty as the backing store for Title.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TitleProperty =
-            DependencyProperty.Register("Title", typeof(string), typeof(FileProgressView), new PropertyMetadata("Progressing", TitleChanged));
+            DependencyProperty.Register("Title", typeof(string), typeof(FileProgressView),
+                new PropertyMetadata("Progressing", TitleChanged));
 
         private static void TitleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -146,29 +157,31 @@ namespace IOExtensions.View
 
         // Using a DependencyProperty as the backing store for Details.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty DetailsProperty =
-            DependencyProperty.Register("Details", typeof(string), typeof(FileProgressView), new PropertyMetadata("Details about task", DetailsChanged));
+            DependencyProperty.Register("Details", typeof(string), typeof(FileProgressView),
+                new PropertyMetadata("Details about task", DetailsChanged));
 
         private static void DetailsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-           // (d as FileProgressView).TitleTextBlock.Text = (string)e.NewValue;
+            // (d as FileProgressView).TitleTextBlock.Text = (string)e.NewValue;
         }
 
 
-        public Transferer Transferer
+        public ITransferer Transferer
         {
-            get { return (Transferer)GetValue(TransfererProperty); }
+            get { return (ITransferer)GetValue(TransfererProperty); }
             set { SetValue(TransfererProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for Transferer.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TransfererProperty =
-            DependencyProperty.Register("Transferer", typeof(Transferer), typeof(FileProgressView), new PropertyMetadata(TransfererChanged));
+            DependencyProperty.Register("Transferer", typeof(ITransferer), typeof(FileProgressView),
+                new PropertyMetadata(TransfererChanged));
 
-        private readonly Subject<Transferer> transfererChanges = new Subject<Transferer>();
+        private readonly Subject<ITransferer> transfererChanges = new Subject<ITransferer>();
 
         private static void TransfererChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            (d as FileProgressView).transfererChanges.OnNext(e.NewValue as Transferer);
+            (d as FileProgressView).transfererChanges.OnNext(e.NewValue as ITransferer);
         }
 
 
@@ -182,7 +195,8 @@ namespace IOExtensions.View
 
         // Using a DependencyProperty as the backing store for Source.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SourceProperty =
-            DependencyProperty.Register("Source", typeof(string), typeof(FileProgressView), new PropertyMetadata(null, SourceChanged));
+            DependencyProperty.Register("Source", typeof(string), typeof(FileProgressView),
+                new PropertyMetadata(null, SourceChanged));
 
         private readonly Subject<string> sourceChanges = new Subject<string>();
 
@@ -200,7 +214,8 @@ namespace IOExtensions.View
 
         // Using a DependencyProperty as the backing store for Destination.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty DestinationProperty =
-            DependencyProperty.Register("Destination", typeof(string), typeof(FileProgressView), new PropertyMetadata(null, DestinationChanged));
+            DependencyProperty.Register("Destination", typeof(string), typeof(FileProgressView),
+                new PropertyMetadata(null, DestinationChanged));
 
         private readonly Subject<string> destinationChanges = new Subject<string>();
 
@@ -217,22 +232,25 @@ namespace IOExtensions.View
 
         // Using a DependencyProperty as the backing store for Complete.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsCompleteProperty =
-            DependencyProperty.Register("IsComplete", typeof(bool), typeof(FileProgressView), new PropertyMetadata(false));
+            DependencyProperty.Register("IsComplete", typeof(bool), typeof(FileProgressView),
+                new PropertyMetadata(false));
 
-        public static readonly RoutedEvent CompleteEvent = EventManager.RegisterRoutedEvent("Complete", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(FileProgressView));
+        public static readonly RoutedEvent CompleteEvent = EventManager.RegisterRoutedEvent("Complete",
+            RoutingStrategy.Bubble, typeof(MultiProgress.TimeSpanRoutedEventHandler), typeof(FileProgressView));
 
         // Provide CLR accessors for the event
-        public event RoutedEventHandler Complete
+        public event MultiProgress.TimeSpanRoutedEventHandler Complete
         {
-            add { AddHandler(CompleteEvent, value); }
-            remove { RemoveHandler(CompleteEvent, value); }
+            add => AddHandler(CompleteEvent, value);
+            remove => RemoveHandler(CompleteEvent, value);
         }
 
+        public IObservable<TimeSpan> CompleteEvents { get; }
+
         // This method raises the Complete event
-        void RaiseCompleteEvent()
+        void RaiseCompleteEvent(TimeSpan timeSpan)
         {
-            RoutedEventArgs newEventArgs = new RoutedEventArgs(FileProgressView.CompleteEvent);
-            RaiseEvent(newEventArgs);
+            RaiseEvent(new TimeSpanRoutedEventArgs(FileProgressView.CompleteEvent, timeSpan));
         }
 
         public bool IsReadOnly
@@ -243,7 +261,8 @@ namespace IOExtensions.View
 
         // Using a DependencyProperty as the backing store for IsReadOnly.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsReadOnlyProperty =
-            DependencyProperty.Register("IsReadOnly", typeof(bool), typeof(FileProgressView), new PropertyMetadata(false, readOnlyChanged));
+            DependencyProperty.Register("IsReadOnly", typeof(bool), typeof(FileProgressView),
+                new PropertyMetadata(false, readOnlyChanged));
 
         private readonly Subject<bool> readOnlyChanges = new Subject<bool>();
 
@@ -252,15 +271,16 @@ namespace IOExtensions.View
             (d as FileProgressView).readOnlyChanges.OnNext((bool)e.NewValue);
         }
 
-        public ICommand TransferCommand
+        public ICommand RunCommand
         {
-            get { return (ICommand)GetValue(TransferCommandProperty); }
-            set { SetValue(TransferCommandProperty, value); }
+            get { return (ICommand)GetValue(RunCommandProperty); }
+            set { SetValue(RunCommandProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for TransferCommand.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty TransferCommandProperty =
-            DependencyProperty.Register("TransferCommand", typeof(ICommand), typeof(FileProgressView), new PropertyMetadata(null));
+        // Using a DependencyProperty as the backing store for RunCommand.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty RunCommandProperty =
+            DependencyProperty.Register("RunCommand", typeof(ICommand), typeof(FileProgressView),
+                new PropertyMetadata(null));
 
         public bool ShowTransfer
         {
@@ -270,7 +290,8 @@ namespace IOExtensions.View
 
         // Using a DependencyProperty as the backing store for ShowTransfer.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ShowTransferProperty =
-            DependencyProperty.Register("ShowTransfer", typeof(bool), typeof(FileProgressView), new PropertyMetadata(true, showTransferChanged));
+            DependencyProperty.Register("ShowTransfer", typeof(bool), typeof(FileProgressView),
+                new PropertyMetadata(true, showTransferChanged));
 
         private readonly Subject<bool> showTransferChanges = new Subject<bool>();
 
@@ -296,4 +317,16 @@ namespace IOExtensions.View
 
         }
     }
+
+    //public static class ObservableHelper
+    //{
+
+    //    public static IObservable<TimeSpan> ToCompleteChanges(this FileProgressView control)
+    //    {
+    //        return Observable.FromEventPattern<MultiProgress.TimeSpanRoutedEventHandler, TimeSpanRoutedEventArgs>(
+    //                h => control.Complete += h,
+    //                h => control.Complete -= h)
+    //            .Select(a => a.EventArgs.TimeSpan);
+    //    }
+    //}
 }

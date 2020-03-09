@@ -4,45 +4,21 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:view="clr-namespace:IOExtensions.View;assembly=IOExtensions.View"
-        xmlns:wpfApp="clr-namespace:IOExtensions.WPFApp"
-        xmlns:hc="https://handyorg.github.io/handycontrol"
-        xmlns:view1="clr-namespace:IOExtensions.View"
-        xmlns:reactive="clr-namespace:IOExtensions.Reactive;assembly=IOExtensions.Reactive"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="SecondaryWindow" Height="450" Width="800">
+    <TabControl>
+        <TabItem Header="Secondary" HorizontalAlignment="Right" Margin="0" >
+            <view:FileProgressControl x:Name="FileProgressView1" IsReadOnly="False" ShowTransfer="True"></view:FileProgressControl>
+        </TabItem>
 
-    <Window.Resources>
-        <reactive:ReactiveAsynExtract x:Key="Transferer1"></reactive:ReactiveAsynExtract>
-        <reactive:ReactiveAsyncCopy x:Key="Transferer2"></reactive:ReactiveAsyncCopy>
+        <TabItem Header="Tertiary" HorizontalAlignment="Right" Margin="0" >
+            <view:FileProgressControl x:Name="FileProgressView3" IsReadOnly="False" ShowTransfer="True"></view:FileProgressControl>
+        </TabItem>
 
-        <x:Array x:Key="FileProgressViewArray" Type="{x:Type view:FileProgressView}">
-            <view:FileProgressView   x:Name="FileProgressView1" 
-                                     IsReadOnly="True" 
-                                     ShowTransfer="False"
-                                     Title="Unzipping"
-                                     Transferer="{StaticResource Transferer1}"
-                                     ></view:FileProgressView>
-
-            <view:FileProgressView   x:Name="FileProgressView2" 
-                                     IsReadOnly="True" 
-                                     ShowTransfer="False"
-                                     Title="Copying"
-                                     Transferer="{StaticResource Transferer2}"
-                                     ></view:FileProgressView>
-        </x:Array>
-
-    </Window.Resources>
-    <Grid>
-
-        <view1:MultiStageProgress ProgressViews="{Binding Source={StaticResource FileProgressViewArray}}"/>
-
-        <DockPanel Visibility="Collapsed" x:Name="FileProgress2Panel">
-            <StackPanel DockPanel.Dock="Top" Visibility="Hidden" x:Name="GridButton"  >
-                <Button x:Name ="CloseButton"  Content="Close To Complete Update" Width="150" Height="30"  ></Button>
-                <Button x:Name ="CancelButton"  Content="Cancel Close" Width="150" Height="30"  ></Button>
+        <TabItem Header="Multi Stage" x:Name="MultiStage">
+            <StackPanel Height="700" Width="1000">
+                <Button x:Name="ShowDefault" Width="250" Height="40" Content="Show Multi Stage Default" Click="Show_Default_OnClick" Margin="20"></Button>
             </StackPanel>
-        </DockPanel>
-
-    </Grid>
-
+        </TabItem>
+    </TabControl>
 </Window>

@@ -10,21 +10,22 @@ using SevenZip;
 namespace IOExtensions.Reactive
 {
 
-    public class ReactiveAsynExtract : Transferer
+    public class ReactiveAsynExtract : ITransferer
     {
         private string dll7z = AppDomain.CurrentDomain.BaseDirectory + "7z.dll";
-        private string dllSevenZipSharp = AppDomain.CurrentDomain.BaseDirectory + "SevenZipSharp.dll";
 
         private Subject<TransferProgress> transferProgress = new Subject<TransferProgress>();
 
-        public override IObservable<TransferProgress> Transfer(string source, string destinationDirectory)
+        public  IObservable<TransferProgress> Transfer(params string[] args)
         {
+            string source = args[0];
+            string destination = args[1];
 
             async void Init()
             {
-                if (System.IO.File.Exists(source) && System.IO.Directory.Exists(destinationDirectory))
+                if (System.IO.File.Exists(source) && System.IO.Directory.Exists(destination))
                 {
-                    SevenZipExtractor.SetLibraryPath(dll7z);
+                    SevenZipBase.SetLibraryPath(dll7z);
 
                     var extractor = new SevenZipExtractor(source);
                     int max = extractor.ArchiveFileData.Count;
@@ -35,7 +36,13 @@ namespace IOExtensions.Reactive
                         ++current;
                         transferProgress.OnNext(new TransferProgress(start, current) { Total = max });
                     };
-                    extractor.BeginExtractArchive(destinationDirectory);
+                    extractor.BeginExtractArchive(destination);
+                }
+                else
+                {
+                    var sourceExists = System.IO.File.Exists(source) ? string.Empty : "not";
+                    var destinationExists = System.IO.Directory.Exists(destination) ? string.Empty : "not";
+                    throw new Exception($"Source does {sourceExists } exist & destination does {destinationExists} exist.");
                 }
             }
 
@@ -47,42 +54,3 @@ namespace IOExtensions.Reactive
     }
 }
 
-//fileCopyStartTimestamp, partialProgress.BytesTransferred)
-//{
-//Total = rootSourceSize.Size,
-//Transferred = totalTransfered + partialProgress.Transferred,
-//BytesTransferred = totalTransfered + partialProgress.Transferred,
-//StreamSize = rootSourceSize.Size,
-//ProcessedFile = file.FullName
-//};
-
-
-
-//void extr_FileExtractionStarted(object sender, FileInfoEventArgs e)
-//{
-////label1.Content = String.Format("更新文件 {0}", e.FileInfo.FileName);
-//progressBar1.Value += 1;
-//CurrentValue += 1;
-//ImageProgressBar(CurrentValue, MaxValue, 193, image1);
-
-//    if (progressBar1.Maximum == progressBar1.Value)
-//label1.Content = "游戏更新完成";
-//}
-
-//private void Check7zAndSevenZipSharpDll()
-//{
-//bool b1 = System.IO.File.Exists(dll7z);
-//bool b2 = System.IO.File.Exists(dllSevenZipSharp);
-
-//    if (!b1)
-//{
-//    MessageBox.Show("7z.dll 不存在！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-//    // Close();
-//}
-
-//if (!b2)
-//{
-//    MessageBox.Show("SevenZipSharp.dll 不存在！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-//    // Close();
-//}
-//}

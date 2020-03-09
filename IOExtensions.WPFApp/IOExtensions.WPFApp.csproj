@@ -7,22 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Data\7z.dll" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\IOExtensions.Reactive\IOExtensions.Reactive.csproj" />
     <ProjectReference Include="..\IONotifications.View\IOExtensions.View.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="HandyControl" Version="2.4.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Data\7z.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
   </ItemGroup>
 
   <ItemGroup>
