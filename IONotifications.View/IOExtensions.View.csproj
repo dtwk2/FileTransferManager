@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.3</Version>
+    <Version>1.0.7</Version>
     <Description>(user)controls for viewing progress of IO operations</Description>
   </PropertyGroup>
 
@@ -16,17 +16,9 @@
   <ItemGroup>
     <ProjectReference Include="..\IOExtensions.Reactive\IOExtensions.Reactive.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="FileProgressView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="FileProgressView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-
+  <Target Name="PrePackage" BeforeTargets="BuildPackage">
+    <PropertyGroup>
+      <BuildCommand>$(BuildCommand) -IncludeReferencedProjects</BuildCommand>
+    </PropertyGroup>
+  </Target>
 </Project>

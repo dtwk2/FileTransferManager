@@ -112,7 +112,8 @@ namespace IOExtensions.View
                         IsComplete = false;
                         progressBar.Value = transferProgress.Percentage;
 
-                        lblPercent.Text = transferProgress.AsPercentage();
+                        progressBar.Tag = transferProgress.AsPercentage();
+
                         if (transferProgress.BytesTransferred == transferProgress.Total ||
                             transferProgress.Transferred == transferProgress.Total)
                         {

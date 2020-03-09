@@ -33,13 +33,7 @@ namespace IOExtensions.View
         protected readonly Subject<bool> showTransferChanges = new Subject<bool>();
         protected Button transferButton;
         protected Panel TopPanel;
-      //  protected Panel BottomPanel;
-        protected Button BrowseSource;
-        protected Button BrowseDestination;
-        protected TextBox txtDestination;
-        protected TextBox txtSource;
         protected TextBlock TitleTextBlock;
-        protected TextBlock lblPercent;
         protected ProgressBar progressBar;
         protected ContentControl ConfigContentControl;
 
@@ -55,7 +49,6 @@ namespace IOExtensions.View
 
             ConfigContentControlChanges.CombineLatest(this.templateApplied,(a,b)=>a).Subscribe(content =>
                 ConfigContentControl.Content = content);
-
 
             showTransferChanges.CombineLatest(this.templateApplied, (a, b) => a).SubscribeOnDispatcher().Subscribe(a =>
             {
@@ -94,8 +87,9 @@ namespace IOExtensions.View
             transferButton.Command = RunCommand;
 
             TitleTextBlock = this.GetTemplateChild("TitleTextBlock") as TextBlock;
-            this.lblPercent = this.GetTemplateChild("lblPercent") as TextBlock;
-            lblPercent.Text = "0 %";
+            TitleTextBlock.Text = Title;
+            //this.lblPercent = this.GetTemplateChild("lblPercent") as TextBlock;
+            //this.lblPercent.Text = "0 %";
             this.progressBar = this.GetTemplateChild("progressBar") as ProgressBar;
             
             base.OnApplyTemplate();
@@ -104,9 +98,6 @@ namespace IOExtensions.View
 
         protected virtual void ScheduleProgress()
         {
-            lblPercent.Text = "0 %";
-            TitleTextBlock.Text = Title;
-
             var obs = transferButtonsClicks
                 .CombineLatest(
                             this.transfererChanges,
@@ -132,7 +123,7 @@ namespace IOExtensions.View
                         IsComplete = false;
                         progressBar.Value = transferProgress.Percentage;
 
-                        lblPercent.Text = transferProgress.AsPercentage();
+                        progressBar.Tag = transferProgress.AsPercentage();
                         if (transferProgress.BytesTransferred == transferProgress.Total ||
                             transferProgress.Transferred == transferProgress.Total)
                         {
@@ -153,15 +144,13 @@ namespace IOExtensions.View
         }
 
         // Using a DependencyProperty as the backing store for Title.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty TitleProperty =
-            DependencyProperty.Register("Title", typeof(string), typeof(ProgressControl),
-                new PropertyMetadata("Progressing", TitleChanged));
+        public static readonly DependencyProperty TitleProperty = DependencyProperty.Register("Title", typeof(string), typeof(ProgressControl), new PropertyMetadata("Progressing", TitleChanged));
 
         protected readonly Subject<string> titleChanges = new Subject<string>();
+
         private static void TitleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             (d as ProgressControl).titleChanges.OnNext((string)e.NewValue);
-
         }
    
 

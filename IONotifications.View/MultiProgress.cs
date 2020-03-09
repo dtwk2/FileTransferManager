@@ -70,16 +70,19 @@ namespace IOExtensions.View
             return await progressView.CompleteEvents.Take(1).ToTask();
 
             async Task Callback()
-            {
-
+            { 
                 var animation = GetAnimation();
-                var animation2 = GetAnimation2();
+                var task = ToTask(animation);
                 contentControl.BeginAnimation(UIElement.OpacityProperty, animation);
-                await ToTask(animation);
+                await task;
+
                 contentControl.Content = progressView;
+                
+                var animation2 = GetAnimation2();
+                task = ToTask(animation2);
                 contentControl.BeginAnimation(UIElement.OpacityProperty, animation2);
                 progressView.RunCommand.Execute(null);
-                await ToTask(animation2);
+                await task;
 
                 static DoubleAnimation GetAnimation() => new DoubleAnimation
                 {
