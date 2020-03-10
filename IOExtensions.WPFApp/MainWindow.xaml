@@ -7,12 +7,18 @@
         mc:Ignorable="d"
         Title="SecondaryWindow" Height="450" Width="800">
     <TabControl>
-        <TabItem Header="Secondary" HorizontalAlignment="Right" Margin="0" >
+
+        <TabItem Header="Copy" HorizontalAlignment="Right" Margin="0" >
             <view:FileProgressControl x:Name="FileProgressView1" IsReadOnly="False" ShowTransfer="True"></view:FileProgressControl>
         </TabItem>
 
-        <TabItem Header="Tertiary" HorizontalAlignment="Right" Margin="0" >
+
+        <TabItem Header="UnZip" HorizontalAlignment="Right" Margin="0" >
             <view:FileProgressControl x:Name="FileProgressView3" IsReadOnly="False" ShowTransfer="True"></view:FileProgressControl>
+        </TabItem>
+
+        <TabItem Header="Dummy" HorizontalAlignment="Right" Margin="0" >
+            <view:ProgressControl x:Name="ProgressView1" IsReadOnly="False" ShowTransfer="True"></view:ProgressControl>
         </TabItem>
 
         <TabItem Header="Multi Stage" x:Name="MultiStage">

@@ -6,8 +6,4 @@
     <Version>1.0.2</Version>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\IOExtensions.Core\IOExtensions.Core.csproj" />
-  </ItemGroup>
-
 </Project>

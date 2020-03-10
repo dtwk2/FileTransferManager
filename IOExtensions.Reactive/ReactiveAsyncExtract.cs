@@ -16,12 +16,12 @@ namespace IOExtensions.Reactive
 
         private Subject<TransferProgress> transferProgress = new Subject<TransferProgress>();
 
-        public  IObservable<TransferProgress> Transfer(params string[] args)
+        public  IObservable<ITransferProgress> Transfer(params string[] args)
         {
             string source = args[0];
             string destination = args[1];
 
-            async void Init()
+            void Init()
             {
                 if (System.IO.File.Exists(source) && System.IO.Directory.Exists(destination))
                 {
@@ -49,7 +49,7 @@ namespace IOExtensions.Reactive
 
             Init();
 
-            return transferProgress;
+            return transferProgress.Cast<ITransferProgress>();
         }
     }
 }

@@ -11,29 +11,43 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
 
-        <reactive:ReactiveAsynExtract x:Key="Transferer1"></reactive:ReactiveAsynExtract>
-        <reactive:ReactiveAsyncCopy x:Key="Transferer2"></reactive:ReactiveAsyncCopy>
+     
+        <reactive:ReactiveAsyncCopy x:Key="Transferer1"></reactive:ReactiveAsyncCopy>
+        <reactive:ReactiveAsynExtract x:Key="Transferer2"></reactive:ReactiveAsynExtract>
+        <reactive:DummyTransferer x:Key="Transferer3"></reactive:DummyTransferer>
 
 
-        <x:Array x:Key="Arr" Type="{x:Type view:FileProgressControl}">
-            <view:FileProgressControl   x:Name="FileProgressView1" 
-                                     IsReadOnly="True" 
-                                     ShowTransfer="False"
-                                     Source = "..\\..\\..\\Data\\Book.7z"
-                                     Destination = "Destination"
-                                     Title="Unzipping"
-                                     Transferer="{StaticResource Transferer1}"
-            ></view:FileProgressControl>
+      
+            <x:Array x:Key="Arr" Type="{x:Type view:ProgressControl}">
 
-            <view:FileProgressControl   x:Name="FileProgressView2" 
+
+                <view:FileProgressControl   x:Name="FileProgressView1" 
+               
                                         IsReadOnly="True" 
                                         ShowTransfer="False"
-                                        Source ="{Binding Path=DownloadsFolder, Source={x:Static Application.Current}}"
-                                        Destination = "..\\..\\..\\bin\\Debug\\"
+                                        Source = "..\..\..\Data\Book.7z"
+                                        Destination = "..\..\..\Data\Destination"
+                                        Title="Unzipping"
+                                        Transferer="{StaticResource Transferer1}"
+            ></view:FileProgressControl>
+
+                <view:FileProgressControl   x:Name="FileProgressView2" 
+                                        IsReadOnly="True" 
+                                        ShowTransfer="False"
+                                     
+                                        Source ="..\..\..\Data\Destination\Book.7z"
+                                        Destination = "..\..\..\Data\Destination\\"
                                         Title="Copying"
                                         Transferer="{StaticResource Transferer2}"
             ></view:FileProgressControl>
-        </x:Array>
+
+                <view:ProgressControl   x:Name="ProgressView1" 
+                                    IsReadOnly="True" 
+                                    ShowTransfer="False"
+                                    Title="Dummy"
+                                    Transferer="{StaticResource Transferer3}"
+            ></view:ProgressControl>
+            </x:Array>
 
     </UserControl.Resources>
     <Grid>

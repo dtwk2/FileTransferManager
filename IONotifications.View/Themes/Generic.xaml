@@ -15,7 +15,7 @@
                     <Grid x:Name="TemplateRoot" SnapsToDevicePixels="true">
                         <Grid Margin="0,0,50,0">
 
-                            <Rectangle x:Name="PART_Track" Fill="White" />
+                            <Border x:Name="PART_Track" Background="White" CornerRadius="8"/>
 
                             <Border x:Name="roundBorder" Background="LightGray" CornerRadius="8" />
 

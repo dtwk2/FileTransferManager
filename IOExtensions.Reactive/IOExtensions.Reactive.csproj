@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\IOExtensions.Abstract\IOExtensions.Abstract.csproj" />
+    <ProjectReference Include="..\IOExtensions.Core\IOExtensions.Core.csproj" />
   </ItemGroup>
 
 </Project>

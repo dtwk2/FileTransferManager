@@ -47,7 +47,7 @@ namespace IOExtensions.View
 
             RunCommand = new DelegateCommand<object>(unit => transferButtonsClicks.OnNext(Unit.Default));
 
-            ConfigContentControlChanges.CombineLatest(this.templateApplied,(a,b)=>a).Subscribe(content =>
+            ConfigContentControlChanges.CombineLatest(this.templateApplied, (a, b) => a).Subscribe(content =>
                 ConfigContentControl.Content = content);
 
             showTransferChanges.CombineLatest(this.templateApplied, (a, b) => a).SubscribeOnDispatcher().Subscribe(a =>
@@ -99,31 +99,29 @@ namespace IOExtensions.View
         protected virtual void ScheduleProgress()
         {
             var obs = transferButtonsClicks
-                .CombineLatest(
-                            this.transfererChanges,
+                .CombineLatest(this.templateApplied, (a, b) => a)
+                .WithLatestFrom(
+                    this.transfererChanges,
                             (a, b) => b);
 
-            obs.Subscribe(a =>
-            {
-                TitleTextBlock.Visibility = Visibility.Visible;
-                transferButton.Visibility = Visibility.Collapsed;
-            });
 
             obs
-                .SelectMany(transferer =>
+                .Select(transferer =>
                 {
                     return transferer.Transfer()
-                        .Scan((date: DateTime.Now, default(TimeSpan), default(TransferProgress)),
+                        .Scan((date: DateTime.Now, default(TimeSpan), default(ITransferProgress)),
                             (d, t) => (d.date, DateTime.Now - d.date, t));
-                }).Subscribe(a =>
+                })
+                .Switch()
+                .Subscribe(a =>
                 {
-                    (DateTime start, TimeSpan timeSpan, TransferProgress transferProgress) = a;
+                    (DateTime start, TimeSpan timeSpan, ITransferProgress transferProgress) = a;
                     this.Dispatcher.Invoke(() =>
                     {
                         IsComplete = false;
                         progressBar.Value = transferProgress.Percentage;
 
-                        progressBar.Tag = transferProgress.AsPercentage();
+                        progressBar.Tag = transferProgress.Fraction.ToString("00 %");
                         if (transferProgress.BytesTransferred == transferProgress.Total ||
                             transferProgress.Transferred == transferProgress.Total)
                         {
@@ -134,6 +132,13 @@ namespace IOExtensions.View
                         }
                     });
                 });
+
+
+            obs.Subscribe(a =>
+            {
+                TitleTextBlock.Visibility = Visibility.Visible;
+                transferButton.Visibility = Visibility.Collapsed;
+            });
         }
 
 

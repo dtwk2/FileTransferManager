@@ -12,15 +12,16 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using IOExtensions.Reactive;
+using SevenZip;
 
 namespace IOExtensions.WPFApp
 {
-    /// <summary>
-    /// Interaction logic for SecondaryWindow.xaml
+
     /// </summary>
     public partial class MainWindow : Window
     {
 
+        private string dll7z = AppDomain.CurrentDomain.BaseDirectory + "7z.dll";
 
         private readonly Subject<bool> subject = new Subject<bool>();
 
@@ -28,25 +29,48 @@ namespace IOExtensions.WPFApp
         {
             InitializeComponent();
 
-            FileProgressView1.Source = Environment.GetFolderPath( Environment.SpecialFolder.UserProfile) + @"\Downloads";
+
+            FileProgressView1.Source = @"../../../Data/DummyFile/huge_dummy_file.7z";
             FileProgressView1.Transferer = new ReactiveAsyncCopy();
-            FileProgressView1.Destination = "..\\..\\..\\bin\\Debug\\";
+
+            FileProgressView1.Destination = "../../../Data/Destination";
 
 
-            FileProgressView3.Source = "..\\..\\..\\Data\\Book.7z";
+
             FileProgressView3.Destination = "..\\..\\..\\Data\\Destination";
             System.IO.Directory.CreateDirectory(FileProgressView3.Destination);
             FileProgressView3.Transferer = new ReactiveAsynExtract();
 
-          //  CreateDummyFile();
 
+            ProgressView1.Transferer = new DummyTransferer();
+            CreateDummyFile();
+            CreateDummyZipFile();
+
+        }
+
+        private void CreateDummyZipFile()
+        {
+            if (File.Exists(@"../../../Data/DummyFile/huge_dummy_file.7z") == false)
+            {
+                SevenZipBase.SetLibraryPath(dll7z);
+
+                var compressor = new SevenZipCompressor();
+
+                compressor.CompressionMode = CompressionMode.Create;
+                compressor.TempFolderPath = System.IO.Path.GetTempPath();
+                compressor.ArchiveFormat = OutArchiveFormat.SevenZip;
+                compressor.CompressDirectory(@"../../../Data/DummyFile", @"../../../Data/DummyFile/huge_dummy_file.7z"); //Error
+            }
         }
 
         private void CreateDummyFile()
         {
-            if (!File.Exists(@"../../../Data/huge_dummy_file"))
+
+            if (!File.Exists(@"../../../Data/DummyFile/huge_dummy_file"))
             {
-                FileStream fs = new FileStream(@"../../../Data/huge_dummy_file", FileMode.CreateNew);
+
+                Directory.CreateDirectory(@"../../../Data/DummyFile");
+                FileStream fs = new FileStream(@"../../../Data/DummyFile/huge_dummy_file", FileMode.CreateNew);
                 fs.Seek(500L * 1024 * 1024, SeekOrigin.Begin);
                 fs.WriteByte(0);
                 fs.Close();
@@ -63,4 +87,4 @@ namespace IOExtensions.WPFApp
             MultiStage.Content = new MultiStageProgressView();
         }
     }
-}
+    }

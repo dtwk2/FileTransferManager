@@ -1,8 +1,9 @@
 ﻿using System;
+using IOExtensions.Abstract;
 
 namespace IOExtensions.Core
 {
-    public class TransferProgress
+    public class TransferProgress : ITransferProgress
     {
         public TransferProgress(DateTime startedTimestamp, long bytesTransfered)
         {
@@ -22,7 +23,7 @@ namespace IOExtensions.Core
 
         public double BytesPerSecond { get; }
 
-        public double Fraction =>   BytesTransferred / (double) Total;
+        public double Fraction => BytesTransferred / (double)Total;
 
 
         public double Percentage => 100.0 * Fraction;
@@ -44,6 +45,6 @@ namespace IOExtensions.Core
         }
 
         public string AsPercentage() => Fraction.ToString("00 %");
-        
+
     }
 }

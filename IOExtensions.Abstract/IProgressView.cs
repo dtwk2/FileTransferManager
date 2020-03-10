@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Windows;
 using System.Windows.Input;
 
-namespace IOExtensions.View
+namespace IOExtensions.Abstract
 {
     public interface IProgressView
     {

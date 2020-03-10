@@ -100,19 +100,21 @@ namespace IOExtensions.View
                 {
                     var (source, destination, transferer) = abc;
                     return transferer.Transfer(source, destination)
-                        .Scan((date: DateTime.Now, default(TimeSpan), default(TransferProgress)),
+                        .Scan((date: DateTime.Now, default(TimeSpan), default(ITransferProgress)),
                             (d, t) => (d.date, DateTime.Now - d.date, t));
                 })
                 .CombineLatest(templateApplied, (a, b) => a)
                 .Subscribe(a =>
                 {
-                    (DateTime start, TimeSpan timeSpan, TransferProgress transferProgress) = a;
+        
+                    (DateTime start, TimeSpan timeSpan, ITransferProgress transferProgress) = a;
                     this.Dispatcher.Invoke(() =>
                     {
                         IsComplete = false;
                         progressBar.Value = transferProgress.Percentage;
 
-                        progressBar.Tag = transferProgress.AsPercentage();
+                   
+                        progressBar.Tag = transferProgress.Fraction.ToString("00 %");
 
                         if (transferProgress.BytesTransferred == transferProgress.Total ||
                             transferProgress.Transferred == transferProgress.Total)

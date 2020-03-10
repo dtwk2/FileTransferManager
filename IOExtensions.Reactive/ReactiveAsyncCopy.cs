@@ -13,7 +13,7 @@ namespace IOExtensions.Reactive
     {
         private Subject<TransferProgress> transferProgress = new Subject<TransferProgress>();
 
-        public IObservable<TransferProgress> Transfer(params string[] args)
+        public IObservable<ITransferProgress> Transfer(params string[] args)
         {
             string source = args[0];
             string destination = args[1];
@@ -31,7 +31,7 @@ namespace IOExtensions.Reactive
 
             Init();
 
-            return transferProgress;
+            return transferProgress.Cast<ITransferProgress>();
         }
     }
 }
