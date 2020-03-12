@@ -9,16 +9,24 @@
     <TabControl>
 
         <TabItem Header="Copy" HorizontalAlignment="Right" Margin="0" >
-            <view:FileProgressControl x:Name="FileProgressView1" IsReadOnly="False" ShowTransfer="True"></view:FileProgressControl>
+            <view:TransferProgressControl x:Name="FileProgressView1" IsReadOnly="False" ShowTransfer="True"></view:TransferProgressControl>
         </TabItem>
 
 
         <TabItem Header="UnZip" HorizontalAlignment="Right" Margin="0" >
-            <view:FileProgressControl x:Name="FileProgressView3" IsReadOnly="False" ShowTransfer="True"></view:FileProgressControl>
+            <view:TransferProgressControl x:Name="FileProgressView3" IsReadOnly="False" ShowTransfer="True"></view:TransferProgressControl>
         </TabItem>
 
         <TabItem Header="Dummy" HorizontalAlignment="Right" Margin="0" >
             <view:ProgressControl x:Name="ProgressView1" IsReadOnly="False" ShowTransfer="True"></view:ProgressControl>
+        </TabItem>
+
+        <TabItem Header="Zip" HorizontalAlignment="Right" Margin="0" >
+            <view:TransferProgressControl x:Name="FileProgressView4" IsReadOnly="False" ShowTransfer="True"></view:TransferProgressControl>
+        </TabItem>
+
+        <TabItem Header="Delete" HorizontalAlignment="Right" Margin="0" >
+            <view:FileProgressControl x:Name="FileProgressView5" IsReadOnly="False" ShowTransfer="True"></view:FileProgressControl>
         </TabItem>
 
         <TabItem Header="Multi Stage" x:Name="MultiStage">

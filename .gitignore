@@ -334,3 +334,5 @@ nugetCommands.txt
 /IOExtensions.WPFApp/Data/Destination/ource/repos/UpdateApplication/FileTransferManager/IOExtensions.WPFApp/Data/DummyFile/huge_dummy_ile
 *.7z
 /IOExtensions.WPFApp/Data/DummyFile/huge_dummy_file
+/IOExtensions.WPFApp/Data/Source/huge_dummy_file
+/IOExtensions.WPFApp/Data/Destination/huge_dummy_file

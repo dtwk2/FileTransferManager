@@ -79,13 +79,13 @@
                             </Grid.RowDefinitions>
 
                             <Grid x:Name="TopPanel">
-                                <Button Margin="30" HorizontalAlignment="Center" Content="Transfer"   VerticalAlignment="Center" Width="89" Height="32" Name="transferButton"/>
+                                <Button Margin="30" HorizontalAlignment="Center" Content="Run"   VerticalAlignment="Center" Width="89" Height="32" Name="transferButton"/>
                                 <TextBlock x:Name="TitleTextBlock" Visibility="Collapsed" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold" ></TextBlock>
                             </Grid>
 
                             <Viewbox Grid.Row="1" >
-                            
-                                    <ProgressBar HorizontalAlignment="Left"  VerticalAlignment="Center" Width="300" Margin="15" Name="progressBar" Style="{StaticResource ProgressBarStyle}" />
+
+                                <ProgressBar HorizontalAlignment="Left"  VerticalAlignment="Center" Width="300" Margin="15" Name="progressBar" Style="{StaticResource ProgressBarStyle}" />
 
                             </Viewbox>
 
@@ -114,5 +114,14 @@
         </StackPanel>
 
     </UniformGrid>
+
+
+
+    <StackPanel   x:Key="FileControl" Orientation="Horizontal">
+        <Label Content="File" HorizontalAlignment="Left"   Margin="0,0,10,0"  VerticalAlignment="Top" FontSize="14"  Width="100"/>
+        <TextBox HorizontalAlignment="Left" Height="31"   VerticalAlignment="Top" Width="300" Name="txtFile" VerticalContentAlignment="Center" />
+        <Button x:Name="BrowseFile" Content="..." FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Width="40"  Height="31"/>
+    </StackPanel>
+
 
 </ResourceDictionary>

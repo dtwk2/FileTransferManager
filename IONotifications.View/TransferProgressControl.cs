@@ -28,20 +28,26 @@ namespace IOExtensions.View
     /// <summary>
     /// Interaction logic for FileProgressControl.xaml
     /// </summary>
-    public partial class FileProgressControl : ProgressControl
+    public partial class TransferProgressControl : ProgressControl
     {
-        private Button BrowseFile;
-        private TextBox txtFile;
+        private Button BrowseSource;
+        private Button BrowseDestination;
+        private TextBox txtDestination;
+        private TextBox txtSource;
 
 
-        static FileProgressControl()
+
+        static TransferProgressControl()
         {
             //  DefaultStyleKeyProperty.OverrideMetadata(typeof(FileProgressControl), new FrameworkPropertyMetadata(typeof(FileProgressControl)));
         }
 
-        public FileProgressControl() : base()
+        public TransferProgressControl() : base()
         {
-            this.fileChanges.CombineLatest(this.templateApplied,(a,b)=>a).Subscribe(a => { txtFile.Text = a; });
+            this.sourceChanges.CombineLatest(this.templateApplied,(a,b)=>a).Subscribe(a => { txtSource.Text = a; });
+            this.destinationChanges.CombineLatest(this.templateApplied, (a, b) => a).Subscribe(a => { txtDestination.Text = a; });
+        
+
         }
 
         public override void OnApplyTemplate()
@@ -49,16 +55,24 @@ namespace IOExtensions.View
 
             var myResourceDictionary = new ResourceDictionary();
             myResourceDictionary.Source = new Uri("/IOExtensions.View;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute);
-            var uGrid = myResourceDictionary["FileControl"] as StackPanel;
+            var uGrid = myResourceDictionary["Expander1"] as UniformGrid;
 
             this.ConfigContent = uGrid;
 
-            this.BrowseFile = uGrid.FindChild<Button>("BrowseFile");
-            this.txtFile = uGrid.FindChild<TextBox>("txtFile");
+            ;
+            this.BrowseSource = uGrid.FindChild<Button>("BrowseSource");
+            this.BrowseDestination = uGrid.FindChild<Button>("BrowseDestination");
+            this.txtDestination = uGrid.FindChild<TextBox>("txtDestination");
+            this.txtSource = uGrid.FindChild<TextBox>("txtSource");
 
-            if (File != null)
+            if (Source != null)
             {
-                fileChanges.OnNext(File);
+                sourceChanges.OnNext(Source);
+            }
+
+            if (Destination != null)
+            {
+                destinationChanges.OnNext(Destination);
             }
 
 
@@ -69,10 +83,10 @@ namespace IOExtensions.View
         protected override void ScheduleProgress()
         {
             var obs = transferButtonsClicks
-                .WithLatestFrom(this.fileChanges.DistinctUntilChanged()
-                        .CombineLatest(
+                .WithLatestFrom(this.sourceChanges.DistinctUntilChanged()
+                        .CombineLatest(this.destinationChanges.DistinctUntilChanged(),
                             this.transfererChanges,
-                            (a, b) => (a, b)),
+                            (a, b, c) => (a, b, c)),
                     (a, b) => b);
 
             obs.CombineLatest(templateApplied,(a,b)=>a).Subscribe(a =>
@@ -84,8 +98,8 @@ namespace IOExtensions.View
             obs
                 .SelectMany(abc =>
                 {
-                    var (source, transferer) = abc;
-                    return transferer.Transfer(source)
+                    var (source, destination, transferer) = abc;
+                    return transferer.Transfer(source, destination)
                         .Scan((date: DateTime.Now, default(TimeSpan), default(ITransferProgress)),
                             (d, t) => (d.date, DateTime.Now - d.date, t));
                 })
@@ -115,25 +129,41 @@ namespace IOExtensions.View
         }
 
 
-        public string File
+        public string Source
         {
-            get { return (string)GetValue(FileProperty); }
-            set { SetValue(FileProperty, value); }
+            get { return (string)GetValue(SourceProperty); }
+            set { SetValue(SourceProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for File.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty FileProperty =
-            DependencyProperty.Register("File", typeof(string), typeof(FileProgressControl), new PropertyMetadata(null, SourceChanged));
+        public static readonly DependencyProperty SourceProperty =
+            DependencyProperty.Register("File", typeof(string), typeof(TransferProgressControl), new PropertyMetadata(null, SourceChanged));
 
-        private readonly Subject<string> fileChanges = new Subject<string>();
+        private readonly Subject<string> sourceChanges = new Subject<string>();
 
         private static void SourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            (d as FileProgressControl).fileChanges.OnNext(e.NewValue as string);
+            (d as TransferProgressControl).sourceChanges.OnNext(e.NewValue as string);
         }
 
 
-     
+        public string Destination
+        {
+            get { return (string)GetValue(DestinationProperty); }
+            set { SetValue(DestinationProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Destination.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DestinationProperty =
+            DependencyProperty.Register("Destination", typeof(string), typeof(TransferProgressControl), new PropertyMetadata(null, DestinationChanged));
+
+        private readonly Subject<string> destinationChanges = new Subject<string>();
+
+        private static void DestinationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            (d as TransferProgressControl).destinationChanges.OnNext(e.NewValue as string);
+        }
+
 
     }
 }

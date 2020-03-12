@@ -105,8 +105,6 @@ namespace IOExtensions.View
             }
         }
 
- 
-
         protected virtual void CountDownChange(int a)
         {
             textBlock.Text = a.ToString();

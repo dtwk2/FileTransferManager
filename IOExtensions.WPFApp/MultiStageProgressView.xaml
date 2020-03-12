@@ -21,30 +21,32 @@
             <x:Array x:Key="Arr" Type="{x:Type view:ProgressControl}">
 
 
-                <view:FileProgressControl   x:Name="FileProgressView1" 
-               
+                <view:TransferProgressControl   x:Name="FileProgressView1" 
                                         IsReadOnly="True" 
                                         ShowTransfer="False"
                                         Source = "..\..\..\Data\Book.7z"
+                                        Details="Copying files from source to destination"
                                         Destination = "..\..\..\Data\Destination"
-                                        Title="Unzipping"
-                                        Transferer="{StaticResource Transferer1}"
-            ></view:FileProgressControl>
-
-                <view:FileProgressControl   x:Name="FileProgressView2" 
-                                        IsReadOnly="True" 
-                                        ShowTransfer="False"
-                                     
-                                        Source ="..\..\..\Data\Destination\Book.7z"
-                                        Destination = "..\..\..\Data\Destination\\"
                                         Title="Copying"
-                                        Transferer="{StaticResource Transferer2}"
-            ></view:FileProgressControl>
+
+                                        Transferer="{StaticResource Transferer1}"
+            ></view:TransferProgressControl>
+
+            <view:TransferProgressControl   x:Name="FileProgressView2" 
+                                            IsReadOnly="True" 
+                                            ShowTransfer="False"
+                                            Details="Extracting files with 7Zip"
+                                            Source ="..\..\..\Data\Destination\Book.7z"
+                                            Destination = "..\..\..\Data\Destination\"
+                                            Title="Unzipping"
+                                            Transferer="{StaticResource Transferer2}"
+            ></view:TransferProgressControl>
 
                 <view:ProgressControl   x:Name="ProgressView1" 
                                     IsReadOnly="True" 
                                     ShowTransfer="False"
                                     Title="Dummy"
+                                    Details="Nothing done besides show progress"
                                     Transferer="{StaticResource Transferer3}"
             ></view:ProgressControl>
             </x:Array>

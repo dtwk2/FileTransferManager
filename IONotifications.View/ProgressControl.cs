@@ -57,11 +57,17 @@ namespace IOExtensions.View
 
             readOnlyChanges.CombineLatest(this.templateApplied, (a, b) => a).Subscribe(a =>
             {
-                TopPanel.Visibility = a ? Visibility.Collapsed : Visibility.Visible;
+                transferButton.Visibility = a ? Visibility.Collapsed : Visibility.Visible;
                 ConfigContentControl.Visibility = a ? Visibility.Collapsed : Visibility.Visible;
                 //txtDestination.IsReadOnly = a;
                 //txtSource.IsReadOnly = a;
             });
+
+            detailChanges.CombineLatest(this.templateApplied, (a, b) => a).Subscribe(a =>
+                {
+                    TitleTextBlock.ToolTip = a;
+                });
+
 
             titleChanges.CombineLatest(this.ToLoadedChanges(), (a, b) => a).Subscribe(a =>
             {
@@ -148,7 +154,6 @@ namespace IOExtensions.View
             set { SetValue(TitleProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for Title.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TitleProperty = DependencyProperty.Register("Title", typeof(string), typeof(ProgressControl), new PropertyMetadata("Progressing", TitleChanged));
 
         protected readonly Subject<string> titleChanges = new Subject<string>();
@@ -158,7 +163,6 @@ namespace IOExtensions.View
             (d as ProgressControl).titleChanges.OnNext((string)e.NewValue);
         }
    
-
         public string Details
         {
             get { return (string)GetValue(DetailsProperty); }
@@ -170,9 +174,11 @@ namespace IOExtensions.View
             DependencyProperty.Register("Details", typeof(string), typeof(ProgressControl),
                 new PropertyMetadata("Details about task", DetailsChanged));
 
+        protected readonly Subject<string> detailChanges = new Subject<string>();
+
         private static void DetailsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            // (d as ProgressControl).TitleTextBlock.Text = (string)e.NewValue;
+            (d as ProgressControl).detailChanges.OnNext((string)e.NewValue);
         }
 
         public ITransferer Transferer
