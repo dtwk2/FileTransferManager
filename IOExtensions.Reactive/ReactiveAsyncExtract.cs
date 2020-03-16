@@ -23,8 +23,10 @@ namespace IOExtensions.Reactive
 
             void Init()
             {
-                if (System.IO.File.Exists(source) && System.IO.Directory.Exists(destination))
+                if (System.IO.File.Exists(source) && System.IO.Directory.GetParent(destination).Exists)
                 {
+                    System.IO.Directory.CreateDirectory(destination);
+
                     SevenZipBase.SetLibraryPath(dll7z);
 
                     var extractor = new SevenZipExtractor(source);
@@ -41,8 +43,8 @@ namespace IOExtensions.Reactive
                 else
                 {
                     var sourceExists = System.IO.File.Exists(source) ? string.Empty : "not";
-                    var destinationExists = System.IO.Directory.Exists(destination) ? string.Empty : "not";
-                    throw new Exception($"Source does {sourceExists } exist & destination does {destinationExists} exist.");
+                    var destinationExists = System.IO.Directory.GetParent(destination).Exists ? string.Empty : "not";
+                    throw new Exception($"Source does {sourceExists } exist & destination parent does {destinationExists} exist.");
                 }
             }
 

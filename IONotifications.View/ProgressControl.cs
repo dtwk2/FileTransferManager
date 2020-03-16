@@ -17,7 +17,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using IOExtensions.Abstract;
 using IOExtensions.Core;
-using IOExtensions.Reactive;
 using Prism.Commands;
 
 
@@ -299,27 +298,6 @@ namespace IOExtensions.View
         {
             (d as ProgressControl).ConfigContentControlChanges.OnNext(e.NewValue);
 
-        }
-    }
-
-    public static class ObservableHelper
-    {
-
-        public static IObservable<TimeSpan> ToCompleteChanges(this ProgressControl control)
-        {
-            return Observable.FromEventPattern<MultiProgress.TimeSpanRoutedEventHandler, TimeSpanRoutedEventArgs>(
-                    h => control.Complete += h,
-                    h => control.Complete -= h)
-                .Select(a => a.EventArgs.TimeSpan);
-        }
-
-
-        public static IObservable<RoutedEventArgs> ToLoadedChanges(this Control control)
-        {
-            return Observable.FromEventPattern<RoutedEventHandler, RoutedEventArgs>(
-                    h => control.Loaded += h,
-                    h => control.Loaded -= h)
-                .Select(a => a.EventArgs);
         }
     }
 }

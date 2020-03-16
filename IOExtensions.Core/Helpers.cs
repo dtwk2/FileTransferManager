@@ -5,7 +5,7 @@ namespace IOExtensions.Core
 {
     public enum SuffixStyle { Windows, Binary, Metric }
 
-    internal static class Helpers
+    public static class Helpers
     {
         // 1 KB = 1024 bytes
         private static readonly string[] SizeWindowsSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
@@ -67,7 +67,7 @@ namespace IOExtensions.Core
         }
 
         // Returns true if the path is a dir, false if it's a file and null if it's neither or doesn't exist. 
-        internal static bool? IsDirFile(this string path)
+        public static bool? IsDirFile(this string path)
         {
             bool? result = null;
             

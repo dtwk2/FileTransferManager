@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using IOExtensions.Reactive;
+using IOExtensions.View;
 using SevenZip;
 
 namespace IOExtensions.WPFApp
@@ -28,6 +29,7 @@ namespace IOExtensions.WPFApp
         private const string source = "../../../Data/Source/";
 
         private const string destination = "../../../Data/Destination/";
+        
 
         public MainWindow()
         {
@@ -35,22 +37,27 @@ namespace IOExtensions.WPFApp
 
 
             FileProgressView1.Source = source + "huge_dummy_file";
+            FileProgressView1.SourceType = PathType.File; 
+            FileProgressView1.DestinationType = PathType.File;
             FileProgressView1.Destination = destination;
             FileProgressView1.Transferer = new ReactiveAsyncCopy();
 
 
             FileProgressView3.Source = source + "huge_dummy_file.7z";
+            FileProgressView3.SourceType = PathType.File;
             FileProgressView3.Destination = destination + "Destination";
             FileProgressView3.Transferer = new ReactiveAsynExtract();
 
             ProgressView1.Transferer = new DummyTransferer();
 
             FileProgressView4.Transferer = new ReactiveAsynCompress();
+            FileProgressView4.DestinationType = PathType.File;
             FileProgressView4.Source = source;
             FileProgressView4.Destination = destination;
 
             FileProgressView5.Transferer = new ReactiveAsyncDelete();
-            FileProgressView5.File = source;
+            FileProgressView5.PathType = PathType.File;
+            FileProgressView5.Path = source;
 
 
             System.IO.Directory.CreateDirectory(source);
@@ -97,6 +104,21 @@ namespace IOExtensions.WPFApp
         private void Show_Default_OnClick(object sender, RoutedEventArgs e)
         {
             MultiStage.Content = new MultiStageProgressView();
+        }
+
+        private void FolderBrowser1_OnTextChange(object sender, PathBrowser.TextRoutedEventArgs e)
+        {
+            MessageBox.Show("Folder Change");
+        }
+
+        private void FileBrowser_OnTextChange(object sender, PathBrowser.TextRoutedEventArgs e)
+        {
+            MessageBox.Show("Path Change");
+        }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            FolderBrowser1.SetPath.Execute("A path");
         }
     }
 }

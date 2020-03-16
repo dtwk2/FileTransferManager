@@ -112,9 +112,11 @@ namespace IOExtensions.Core
                 {
                     destinationNewRootDir = Directory.CreateDirectory(Path.Combine(destinationDirectory, rootSource.Name));
                 }
-
+                var fileCopyStartTimestamp = DateTime.Now;
+                bool flag = false;
                 foreach (var directory in rootSource.EnumerateDirectories("*", SearchOption.AllDirectories))
                 {
+                    flag = true;
                     if (cancellationToken.IsCancellationRequested)
                     {
                         return TransferResult.Cancelled;
@@ -125,13 +127,14 @@ namespace IOExtensions.Core
 
                 foreach (var file in rootSource.EnumerateFiles("*", SearchOption.AllDirectories))
                 {
+                    flag = true;
                     if (cancellationToken.IsCancellationRequested)
                     {
                         return TransferResult.Cancelled;
                     }
 
                     var newName = file.FullName.Substring(rootSourceLength + 1);
-                    var fileCopyStartTimestamp = DateTime.Now;
+
                     var result = CopyFileWithProgress(file.FullName, Path.Combine(destinationNewRootDir.FullName, newName), (partialProgress) =>
                     {
                         var totalProgress = new TransferProgress(fileCopyStartTimestamp, partialProgress.BytesTransferred)
@@ -156,6 +159,10 @@ namespace IOExtensions.Core
 
                     totalTransfered += file.Length;
                 }
+
+                if (flag == false)
+                    progress(new TransferProgress(fileCopyStartTimestamp, 1) { Total = 1 });
+
             }
             catch (Exception ex)
             {

@@ -19,7 +19,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using IOExtensions.Abstract;
 using IOExtensions.Core;
-using IOExtensions.Reactive;
 using Prism.Commands;
 
 
@@ -30,37 +29,33 @@ namespace IOExtensions.View
     /// </summary>
     public partial class FileProgressControl : ProgressControl
     {
-        private Button BrowseFile;
-        private TextBox txtFile;
-
+        private PathBrowser fileBrowser;
 
         static FileProgressControl()
         {
-            //  DefaultStyleKeyProperty.OverrideMetadata(typeof(FileProgressControl), new FrameworkPropertyMetadata(typeof(FileProgressControl)));
         }
 
         public FileProgressControl() : base()
         {
-            this.fileChanges.CombineLatest(this.templateApplied,(a,b)=>a).Subscribe(a => { txtFile.Text = a; });
+            this.pathChanges.CombineLatest(this.templateApplied,(a,b)=>a).Subscribe(a =>
+            {
+                if(fileBrowser is PathBrowser pathBrowser)
+                pathBrowser.SetPath.Execute(a);
+            });
         }
 
         public override void OnApplyTemplate()
         {
 
-            var myResourceDictionary = new ResourceDictionary();
-            myResourceDictionary.Source = new Uri("/IOExtensions.View;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute);
-            var uGrid = myResourceDictionary["FileControl"] as StackPanel;
+      
+            fileBrowser = PathType == PathType.File ? (PathBrowser)new FileBrowser() : new FolderBrowser();
+            fileBrowser.TextChange += (s, e) => Path = e.Text;
+            ConfigContent ??= fileBrowser;
 
-            this.ConfigContent = uGrid;
-
-            this.BrowseFile = uGrid.FindChild<Button>("BrowseFile");
-            this.txtFile = uGrid.FindChild<TextBox>("txtFile");
-
-            if (File != null)
+            if (Path != null)
             {
-                fileChanges.OnNext(File);
+                pathChanges.OnNext(Path);
             }
-
 
             base.OnApplyTemplate();
         }
@@ -69,7 +64,7 @@ namespace IOExtensions.View
         protected override void ScheduleProgress()
         {
             var obs = transferButtonsClicks
-                .WithLatestFrom(this.fileChanges.DistinctUntilChanged()
+                .WithLatestFrom(this.pathChanges.DistinctUntilChanged()
                         .CombineLatest(
                             this.transfererChanges,
                             (a, b) => (a, b)),
@@ -115,25 +110,36 @@ namespace IOExtensions.View
         }
 
 
-        public string File
+        public string Path
         {
-            get { return (string)GetValue(FileProperty); }
-            set { SetValue(FileProperty, value); }
+            get { return (string)GetValue(PathProperty); }
+            set { SetValue(PathProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for File.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty FileProperty =
-            DependencyProperty.Register("File", typeof(string), typeof(FileProgressControl), new PropertyMetadata(null, SourceChanged));
+        // Using a DependencyProperty as the backing store for Path.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty PathProperty =
+            DependencyProperty.Register("Path", typeof(string), typeof(FileProgressControl), new PropertyMetadata(null, PathChanged));
 
-        private readonly Subject<string> fileChanges = new Subject<string>();
+        private readonly Subject<string> pathChanges = new Subject<string>();
 
-        private static void SourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void PathChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            (d as FileProgressControl).fileChanges.OnNext(e.NewValue as string);
+            (d as FileProgressControl).pathChanges.OnNext(e.NewValue as string);
         }
 
 
-     
+
+        public PathType PathType
+        {
+            get { return (PathType)GetValue(PathTypeProperty); }
+            set { SetValue(PathTypeProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for PathType.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty PathTypeProperty =
+            DependencyProperty.Register("PathType", typeof(PathType), typeof(FileProgressControl), new PropertyMetadata(PathType.Directory));
+
+
 
     }
 }

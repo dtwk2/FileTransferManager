@@ -23,9 +23,20 @@ namespace IOExtensions.Reactive
             {
                 await Task.Run(() =>
                 {
-                    string[] fileList = Directory.GetFiles(source, "*", SearchOption.AllDirectories);
-                    foreach (var item in DeleteProgress(fileList))
-                        transferProgress.OnNext(item);
+                    if (IOExtensions.Core.Helpers.IsDirFile(source)==true )
+                    {
+                        string[] pathList = Directory.GetFiles(source, "*", SearchOption.AllDirectories);
+                        pathList = pathList.Concat(Directory.GetDirectories(source)).Concat(new[] {source}).ToArray();
+                        foreach (var item in DeleteProgress(pathList))
+                            transferProgress.OnNext(item);
+
+                    }
+                    else if (IOExtensions.Core.Helpers.IsDirFile(source) == false)
+                    {
+                        var dtn = DateTime.Now;
+                        new FileInfo(source).Delete();
+                        transferProgress.OnNext(new TransferProgress(dtn, 1) { Total = 1 });
+                    }
                 });
 
                 IEnumerable<TransferProgress> DeleteProgress(IList<string> fileList)
@@ -35,7 +46,10 @@ namespace IOExtensions.Reactive
                     {
                         try
                         {
-                            new FileInfo(fileList[i]).Delete();
+                            if(IOExtensions.Core.Helpers.IsDirFile(source) ==false)
+                                new FileInfo(fileList[i]).Delete();
+                            if (IOExtensions.Core.Helpers.IsDirFile(source) == true)
+                                new DirectoryInfo(fileList[i]).Delete();
                         }
                         catch (Exception e)
                         {

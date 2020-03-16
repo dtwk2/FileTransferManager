@@ -4,9 +4,35 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:view="clr-namespace:IOExtensions.View;assembly=IOExtensions.View"
+        xmlns:wpfApp="clr-namespace:IOExtensions.WPFApp"
         mc:Ignorable="d"
         Title="SecondaryWindow" Height="450" Width="800">
     <TabControl>
+
+        <TabItem Header="Folder Browse" HorizontalAlignment="Right" Margin="0" >
+            <StackPanel>
+                <Button Height="30" Width="100" Click="ButtonBase_OnClick">Set Path</Button>
+                <view:FolderBrowser x:Name="FolderBrowser1" Label="Test" TextChange="FolderBrowser1_OnTextChange"></view:FolderBrowser>
+            </StackPanel>
+        </TabItem>
+
+
+        <TabItem Header="Path Browse" HorizontalAlignment="Right" Margin="0" >
+            <view:FileBrowser x:Name="FileBrowser" Label="Test" Filter="VS Project | *.csproj" TextChange="FileBrowser_OnTextChange"></view:FileBrowser>
+        </TabItem>
+
+        <TabItem Header="Path Browse 2" HorizontalAlignment="Right" Margin="0" >
+            <wpfApp:FileBrowser2 x:Name="FileBrowser2" Label="Test" Filter="SVG | *.svg"></wpfApp:FileBrowser2>
+        </TabItem>
+
+        <TabItem Header="Path Browse 3" HorizontalAlignment="Right" Margin="0" >
+            <view:FileBrowser x:Name="FileBrowser3" Label="Test" Filter="SVG | *.svg">
+                <view:FileBrowser.TextBoxContent>
+                    <TextBox Width="800" VerticalContentAlignment="Center"></TextBox>
+                </view:FileBrowser.TextBoxContent>
+            </view:FileBrowser>
+        </TabItem>
+
 
         <TabItem Header="Copy" HorizontalAlignment="Right" Margin="0" >
             <view:TransferProgressControl x:Name="FileProgressView1" IsReadOnly="False" ShowTransfer="True"></view:TransferProgressControl>

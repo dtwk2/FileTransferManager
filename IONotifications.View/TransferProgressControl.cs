@@ -1,26 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using IOExtensions.Abstract;
-using IOExtensions.Core;
-using IOExtensions.Reactive;
-using Prism.Commands;
 
 
 namespace IOExtensions.View
@@ -30,10 +13,8 @@ namespace IOExtensions.View
     /// </summary>
     public partial class TransferProgressControl : ProgressControl
     {
-        private Button BrowseSource;
-        private Button BrowseDestination;
-        private TextBox txtDestination;
-        private TextBox txtSource;
+        private PathBrowser BrowseSource;
+        private PathBrowser BrowseDestination;
 
 
 
@@ -44,26 +25,24 @@ namespace IOExtensions.View
 
         public TransferProgressControl() : base()
         {
-            this.sourceChanges.CombineLatest(this.templateApplied,(a,b)=>a).Subscribe(a => { txtSource.Text = a; });
-            this.destinationChanges.CombineLatest(this.templateApplied, (a, b) => a).Subscribe(a => { txtDestination.Text = a; });
-        
+            this.sourceChanges.CombineLatest(this.templateApplied, (a, b) => a)
+                .DistinctUntilChanged()
+                .Subscribe(a => { BrowseSource.SetPath.Execute(a); });
 
+            this.destinationChanges.CombineLatest(this.templateApplied, (a, b) => a)
+                .DistinctUntilChanged()
+                .Subscribe(a => { BrowseDestination.SetPath.Execute(a); });
         }
 
         public override void OnApplyTemplate()
         {
+            var stackPanel = new StackPanel();
+            this.BrowseSource = SourceType==PathType.File? (PathBrowser)new FileBrowser():new FolderBrowser();
+            this.BrowseDestination = DestinationType == PathType.File ? (PathBrowser)new FileBrowser() : new FolderBrowser();
+            this.BrowseSource.TextChange += (s, e) => sourceChanges.OnNext(e.Text);
+            this.BrowseDestination.TextChange += (s, e) => destinationChanges.OnNext(e.Text);
 
-            var myResourceDictionary = new ResourceDictionary();
-            myResourceDictionary.Source = new Uri("/IOExtensions.View;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute);
-            var uGrid = myResourceDictionary["Expander1"] as UniformGrid;
-
-            this.ConfigContent = uGrid;
-
-            ;
-            this.BrowseSource = uGrid.FindChild<Button>("BrowseSource");
-            this.BrowseDestination = uGrid.FindChild<Button>("BrowseDestination");
-            this.txtDestination = uGrid.FindChild<TextBox>("txtDestination");
-            this.txtSource = uGrid.FindChild<TextBox>("txtSource");
+            this.ConfigContent ??= stackPanel;
 
             if (Source != null)
             {
@@ -89,11 +68,11 @@ namespace IOExtensions.View
                             (a, b, c) => (a, b, c)),
                     (a, b) => b);
 
-            obs.CombineLatest(templateApplied,(a,b)=>a).Subscribe(a =>
-            {
-                TitleTextBlock.Visibility = Visibility.Visible;
-                transferButton.Visibility = Visibility.Collapsed;
-            });
+            obs.CombineLatest(templateApplied, (a, b) => a).Subscribe(a =>
+                {
+                    TitleTextBlock.Visibility = Visibility.Visible;
+                    transferButton.Visibility = Visibility.Collapsed;
+                });
 
             obs
                 .SelectMany(abc =>
@@ -106,14 +85,12 @@ namespace IOExtensions.View
                 .CombineLatest(templateApplied, (a, b) => a)
                 .Subscribe(a =>
                 {
-        
+
                     (DateTime start, TimeSpan timeSpan, ITransferProgress transferProgress) = a;
                     this.Dispatcher.Invoke(() =>
                     {
                         IsComplete = false;
                         progressBar.Value = transferProgress.Percentage;
-
-                   
                         progressBar.Tag = transferProgress.Fraction.ToString("00 %");
 
                         if (transferProgress.BytesTransferred == transferProgress.Total ||
@@ -135,9 +112,9 @@ namespace IOExtensions.View
             set { SetValue(SourceProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for File.  This enables animation, styling, binding, etc...
+        // Using a DependencyProperty as the backing store for Path.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SourceProperty =
-            DependencyProperty.Register("File", typeof(string), typeof(TransferProgressControl), new PropertyMetadata(null, SourceChanged));
+            DependencyProperty.Register("Path", typeof(string), typeof(TransferProgressControl), new PropertyMetadata(null, SourceChanged));
 
         private readonly Subject<string> sourceChanges = new Subject<string>();
 
@@ -163,6 +140,35 @@ namespace IOExtensions.View
         {
             (d as TransferProgressControl).destinationChanges.OnNext(e.NewValue as string);
         }
+
+
+
+
+
+        public PathType SourceType
+        {
+            get { return (PathType)GetValue(SourceTypeProperty); }
+            set { SetValue(SourceTypeProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for PathType.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty SourceTypeProperty =
+            DependencyProperty.Register("PathType", typeof(PathType), typeof(TransferProgressControl), new PropertyMetadata(PathType.Directory));
+
+
+
+        public PathType DestinationType
+        {
+            get { return (PathType)GetValue(DestinationTypeProperty); }
+            set { SetValue(DestinationTypeProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for DestinationType.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DestinationTypeProperty =
+            DependencyProperty.Register("DestinationType", typeof(PathType), typeof(TransferProgressControl), new PropertyMetadata(PathType.Directory));
+
+
+
 
 
     }

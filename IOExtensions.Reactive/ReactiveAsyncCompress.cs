@@ -36,8 +36,6 @@ namespace IOExtensions.Reactive
                     {
                         transferProgress.OnNext(new TransferProgress(start, b.PercentDone) { Total = 100 });
                     };
-                    //var path = Path.Combine(destination, new DirectoryInfo(source).Name + ".7z");
-                    //System.IO.File.Delete(path);
                     compressor.BeginCompressDirectory(source, destination);
                 }
                 else
