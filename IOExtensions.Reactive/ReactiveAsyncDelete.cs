@@ -23,7 +23,7 @@ namespace IOExtensions.Reactive
             {
                 await Task.Run(() =>
                 {
-                    if (IOExtensions.Core.Helpers.IsDirFile(source)==true )
+                    if (source.IsDirFile()==true )
                     {
                         string[] pathList = Directory.GetFiles(source, "*", SearchOption.AllDirectories);
                         pathList = pathList.Concat(Directory.GetDirectories(source)).Concat(new[] {source}).ToArray();
@@ -31,11 +31,15 @@ namespace IOExtensions.Reactive
                             transferProgress.OnNext(item);
 
                     }
-                    else if (IOExtensions.Core.Helpers.IsDirFile(source) == false)
+                    else if (source.IsDirFile() == false)
                     {
                         var dtn = DateTime.Now;
                         new FileInfo(source).Delete();
                         transferProgress.OnNext(new TransferProgress(dtn, 1) { Total = 1 });
+                    }
+                    else
+                    {
+                        throw new IOException("Path does not exist on disk.");   
                     }
                 });
 
@@ -46,15 +50,14 @@ namespace IOExtensions.Reactive
                     {
                         try
                         {
-                            if(IOExtensions.Core.Helpers.IsDirFile(source) ==false)
-                                new FileInfo(fileList[i]).Delete();
-                            if (IOExtensions.Core.Helpers.IsDirFile(source) == true)
-                                new DirectoryInfo(fileList[i]).Delete();
+                            (fileList[i].IsDirFile() == false
+                                ? (FileSystemInfo)new FileInfo(fileList[i])
+                                : (FileSystemInfo)new DirectoryInfo(fileList[i])).Delete();
                         }
                         catch (Exception e)
                         {
                             // TODO Need better logging
-                            System.Console.WriteLine(e);
+                            Console.WriteLine(e);
                             //throw;
                         }
                         yield return (new TransferProgress(dateTime, i + 1) { Total = fileList.Count });
